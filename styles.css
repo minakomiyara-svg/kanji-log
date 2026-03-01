@@ -160,3 +160,28 @@ body{
   color:var(--muted);
   font-size:13px;
 }
+
+.kids{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.kidsLabel{
+  font-size:13px;
+  color:#4b5563;
+  font-weight:700;
+}
+
+.kidSelect{
+  padding:10px 10px;
+  border-radius:10px;
+  border:1px solid #e8e8e8;
+  background:#fff;
+  font-weight:700;
+}
+
+.btn.danger{
+  border-color:#f1b3b3;
+}

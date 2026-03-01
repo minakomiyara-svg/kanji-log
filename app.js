@@ -12,7 +12,140 @@ const KANJI_LIST = [
   "外","右","左","休","犬","王","出","上","下","小" // ←ここは仮。あとで本物に置換してOK
 ].slice(0,80);
 
-const STORAGE_KEY = "kanji_sheet_state_v1";
+// ===== 子どもアカウント管理 =====
+const KIDS_KEY = "kanji_kids_v1";
+const ACTIVE_KID_KEY = "kanji_active_kid_v1";
+
+const kidSelect = document.getElementById("kidSelect");
+const addKidBtn = document.getElementById("addKidBtn");
+const renameKidBtn = document.getElementById("renameKidBtn");
+const deleteKidBtn = document.getElementById("deleteKidBtn");
+
+function loadKids(){
+  try{
+    const arr = JSON.parse(localStorage.getItem(KIDS_KEY) || "[]");
+    return Array.isArray(arr) && arr.length ? arr : ["たろう"];
+  }catch{
+    return ["たろう"];
+  }
+}
+function saveKids(kids){
+  localStorage.setItem(KIDS_KEY, JSON.stringify(kids));
+}
+
+let kids = loadKids();
+let activeKid = localStorage.getItem(ACTIVE_KID_KEY) || kids[0];
+
+function storageKeyForKid(name){
+  return `kanji_sheet_state_v1__${encodeURIComponent(name)}`;
+}
+
+function loadStateForKid(name){
+  try{
+    return JSON.parse(localStorage.getItem(storageKeyForKid(name)) || "{}");
+  }catch{
+    return {};
+  }
+}
+function saveStateForKid(name, state){
+  localStorage.setItem(storageKeyForKid(name), JSON.stringify(state));
+}
+
+function refreshKidSelect(){
+  // activeKidがリストにない時の保険
+  if(!kids.includes(activeKid)) activeKid = kids[0];
+
+  kidSelect.innerHTML = "";
+  for(const k of kids){
+    const opt = document.createElement("option");
+    opt.value = k;
+    opt.textContent = k;
+    if(k === activeKid) opt.selected = true;
+    kidSelect.appendChild(opt);
+  }
+  localStorage.setItem(ACTIVE_KID_KEY, activeKid);
+}
+
+function switchKid(name){
+  activeKid = name;
+  localStorage.setItem(ACTIVE_KID_KEY, activeKid);
+  state = loadStateForKid(activeKid);
+  render();
+}
+
+kidSelect?.addEventListener("change", (e) => {
+  switchKid(e.target.value);
+});
+
+addKidBtn?.addEventListener("click", () => {
+  const name = prompt("追加する子どもの名前（例：はなこ）");
+  if(!name) return;
+  const trimmed = name.trim();
+  if(!trimmed) return;
+  if(kids.includes(trimmed)){
+    alert("その名前はすでにあります");
+    return;
+  }
+  kids.push(trimmed);
+  saveKids(kids);
+  switchKid(trimmed);
+  refreshKidSelect();
+});
+
+renameKidBtn?.addEventListener("click", () => {
+  const from = activeKid;
+  const name = prompt("新しい名前", from);
+  if(!name) return;
+  const to = name.trim();
+  if(!to) return;
+  if(to === from) return;
+  if(kids.includes(to)){
+    alert("その名前はすでにあります");
+    return;
+  }
+
+  // データ移行
+  const oldKey = storageKeyForKid(from);
+  const newKey = storageKeyForKid(to);
+  const data = localStorage.getItem(oldKey);
+  if(data != null) localStorage.setItem(newKey, data);
+  localStorage.removeItem(oldKey);
+
+  // kidsリスト更新
+  kids = kids.map(k => (k === from ? to : k));
+  saveKids(kids);
+
+  activeKid = to;
+  localStorage.setItem(ACTIVE_KID_KEY, activeKid);
+  refreshKidSelect();
+  state = loadStateForKid(activeKid);
+  render();
+});
+
+deleteKidBtn?.addEventListener("click", () => {
+  if(kids.length <= 1){
+    alert("最後の1人は削除できません");
+    return;
+  }
+  if(!confirm(`${activeKid} の記録を削除しますか？`)) return;
+
+  // データ削除
+  localStorage.removeItem(storageKeyForKid(activeKid));
+
+  // kidsから削除→別の子に切替
+  kids = kids.filter(k => k !== activeKid);
+  saveKids(kids);
+
+  activeKid = kids[0];
+  localStorage.setItem(ACTIVE_KID_KEY, activeKid);
+  refreshKidSelect();
+  state = loadStateForKid(activeKid);
+  render();
+});
+
+// 初期UI反映
+refreshKidSelect();
+// ===== 子どもアカウント管理ここまで =====
 
 const gridEl = document.getElementById("grid");
 const learnedCountEl = document.getElementById("learnedCount");
@@ -38,7 +171,7 @@ function saveState(state){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-let state = loadState();
+let state = loadStateForKid(activeKid);
 
 function setSelectedColor(color){
   selectedColor = color;
@@ -80,7 +213,7 @@ function render(){
       }
 
       state[kanji] = cur;
-      saveState(state);
+      saveStateForKid(activeKid, state);
       // 表示更新（軽量）
       if(cur.fill) cell.dataset.fill = cur.fill; else cell.removeAttribute("data-fill");
       if(cur.x) cell.dataset.x = "1"; else cell.removeAttribute("data-x");
