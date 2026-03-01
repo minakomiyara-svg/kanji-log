@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>1年生 かん字チェック（80）</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="sheet">
+    <div class="titleBox">
+      <div class="title">1年生でならうかん字 <span class="sub">(全80文字)</span></div>
+      <div class="subtitle">おぼえたら色をつけよう！</div>
+    </div>
+
+    <div class="toolbar">
+      <div class="counts">
+        <span class="pill">覚えた：<b id="learnedCount">0</b> / <b id="totalCount">80</b></span>
+      </div>
+
+      <div class="palette" aria-label="色を選ぶ">
+        <button class="colorBtn selected" data-color="yellow" title="黄色"></button>
+        <button class="colorBtn" data-color="pink" title="ピンク"></button>
+        <button class="colorBtn" data-color="blue" title="青"></button>
+        <button class="colorBtn" data-color="green" title="緑"></button>
+        <button class="colorBtn" data-color="orange" title="オレンジ"></button>
+        <button class="colorBtn" data-color="gray" title="グレー"></button>
+      </div>
+
+      <div class="mode">
+        <label class="switch">
+          <input id="xMode" type="checkbox" />
+          <span>×モード</span>
+        </label>
+      </div>
+
+      <button id="resetBtn" class="btn">ぜんぶ消す</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="grid" class="grid" aria-label="漢字表"></div>
+    <p class="note">※ クリック：色を付ける／もう一回クリック：消す　（保存されます）</p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
