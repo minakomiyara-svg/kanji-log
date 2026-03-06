@@ -1,6 +1,6 @@
 // 1年生の漢字（80）を入れてね：写真の表と同じ順にしたいなら、この配列をその順に並べればOK
 // いまはサンプルとして一部→残りは埋め草（あとで置換しやすい）
-const KANJI_LIST = [
+const GRADE_1 = [
   "一","右","雨","円","王","音","下","火","花","貝",
   "学","気","九","休","玉","金","空","月","犬","見",
   "五","口","校","左","三","山","子","四","糸","字",
@@ -55,9 +55,8 @@ let kids = loadKids();
 let activeKid = localStorage.getItem(ACTIVE_KID_KEY) || kids[0];
 
 function storageKeyForKid(name){
-  return `kanji_sheet_state_v1__${encodeURIComponent(name)}`;
+  return `kanji_sheet_state_v1__${encodeURIComponent(name)}__grade${currentGrade}`;
 }
-
 function loadStateForKid(name){
   try{
     return JSON.parse(localStorage.getItem(storageKeyForKid(name)) || "{}");
@@ -173,7 +172,7 @@ const xModeEl = document.getElementById("xMode");
 
 const paletteButtons = document.querySelectorAll(".colorBtn");
 
-totalCountEl.textContent = String(KANJI_LIST.length);
+totalCountEl.textContent = String(getCurrentKanjiList().length);
 
 let selectedColor = "yellow";
 
@@ -203,7 +202,7 @@ paletteButtons.forEach(btn => {
 function render(){
   gridEl.innerHTML = "";
 
-  for(const kanji of KANJI_LIST){
+for (const kanji of getCurrentKanjiList()) {
     const cell = document.createElement("div");
     cell.className = "cell";
     cell.textContent = kanji;
@@ -247,7 +246,7 @@ function render(){
 function updateCounts(){
   // 「覚えた」は “色が付いているマス” をカウント（×はカウントしない）
   let learned = 0;
-  for(const k of KANJI_LIST){
+  for(const k of getCurrentKanjiList()){
     const st = state[k];
     if(st && st.fill) learned++;
   }
