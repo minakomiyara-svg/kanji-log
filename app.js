@@ -263,3 +263,17 @@ resetBtn.addEventListener("click", () => {
 // 初期色
 setSelectedColor("yellow");
 render();
+
+const gradeTabs = document.querySelectorAll(".gradeTab");
+
+gradeTabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    currentGrade = tab.dataset.grade;
+
+    gradeTabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+
+    state = loadStateForKid(activeKid);
+    render();
+  });
+});

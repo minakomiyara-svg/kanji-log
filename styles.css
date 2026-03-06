@@ -185,3 +185,23 @@ body{
 .btn.danger{
   border-color:#f1b3b3;
 }
+.gradeTabs{
+  display:flex;
+  gap:10px;
+  margin:12px 0 10px;
+}
+
+.gradeTab{
+  border:1px solid #e8bfc5;
+  background:#fff;
+  color:#333;
+  padding:10px 16px;
+  border-radius:999px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.gradeTab.active{
+  background:#f5cfd5;
+  border-color:#dca7b0;
+}
